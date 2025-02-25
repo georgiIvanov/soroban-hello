@@ -12,12 +12,32 @@ impl IncrementContract {
     pub fn increment(env: Env) -> u32 {
         let mut count: u32 = env.storage().instance().get(&COUNTER).unwrap_or(0);
         log!(&env, "count: {}", count);
-
+        
         count += 1;
         env.storage().instance().set(&COUNTER, &count);
         env.storage().instance().extend_ttl(50, 100);
-
+        
         count
+    }
+    
+    pub fn get_current_value(env: Env) -> u32 {
+        env.storage().instance().get(&COUNTER).unwrap_or(0)
+    }
+    
+    pub fn decrement(env: Env) -> u32 {
+        let mut count: u32 = env.storage().instance().get(&COUNTER).unwrap_or(0);
+        if count > 0 {
+            count -= 1;
+            env.storage().instance().set(&COUNTER, &count);
+            env.storage().instance().extend_ttl(50, 100);
+            count
+        } else {
+            panic!("cant decrement when count is 0")
+        }
+    }
+
+    pub fn reset(env: Env) {
+        env.storage().instance().remove(&COUNTER);
     }
 }
 
